@@ -1,4 +1,4 @@
-### FX Exchanger Widget
+## FX Exchanger Widget
 USD, EUR, GBP exchanger
 
-## Add widget to your project
+### Add widget to your project
