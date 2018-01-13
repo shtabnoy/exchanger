@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { getExchangeRates } from '../actions'
 
-class Layout extends Component {
+class App extends Component {
     static propTypes = {
         getExchangeRates: PropTypes.func.isRequired,
         rates: PropTypes.shape().isRequired,
@@ -83,4 +83,4 @@ const mapDispatchToProps = dispatch => ({
     getExchangeRates: base => dispatch(getExchangeRates(base))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Layout)
+export default connect(mapStateToProps, mapDispatchToProps)(App)

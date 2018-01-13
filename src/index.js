@@ -3,21 +3,20 @@ import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import appReducers from './reducers'
-import Layout from './components/Layout'
+import App from './containers/App'
 
 const store = createStore(
     appReducers,
     applyMiddleware(thunk)
 )
 
-class App extends Component {
+export default class ExchangerWidget extends Component {
     render() {
         return (
             <Provider store={store}>
-                <Layout />
+                <App />
             </Provider>
         )
     }
 }
 
-export default App
