@@ -1,8 +1,8 @@
 {
-    "name": "exchanger.js",
+    "name": "exchanger",
     "version": "0.0.1",
     "description": "FX Exchanger",
-    "repository": "shtabnoy/exchanger.js",
+    "repository": "shtabnoy/exchanger",
     "main": "lib/exchanger.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",

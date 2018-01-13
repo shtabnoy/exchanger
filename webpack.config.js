@@ -5,7 +5,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, 'lib'),
         filename: 'exchanger.js',
-        library: 'exchanger.js',
+        library: 'exchanger',
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
