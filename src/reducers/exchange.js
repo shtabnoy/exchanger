@@ -1,11 +1,19 @@
 import {
     EXCHANGE_LOADING,
     EXCHANGE_SUCCESS,
-    EXCHANGE_ERROR
+    EXCHANGE_ERROR,
+    SET_TARGET_CURRENCY,
+    RESET_TARGET_CURRENCY,
+    SET_TARGET_AMOUNT
 } from '../actions'
 
 const getDefaultState = () => ({
-    rates: {},
+    currencies: ['USD', 'EUR', 'GBP'],
+    info: {
+        base: 'USD'
+    },
+    targetCurrency: 'EUR',
+    targetAmount: '0.00',
     isLoading: false,
     isError: false
 })
@@ -20,12 +28,29 @@ export default (state = getDefaultState(), action) => {
         case EXCHANGE_SUCCESS:
             return {
                 ...state,
-                rates: action.rates
+                info: action.info
             }
         case EXCHANGE_ERROR:
             return {
                 ...state,
                 isError: action.isError
+            }
+        case SET_TARGET_CURRENCY:
+            return {
+                ...state,
+                targetCurrency: action.currency
+            }
+        case RESET_TARGET_CURRENCY:
+            return {
+                ...state,
+                targetCurrency: state.info.base === state.targetCurrency ?
+                    state.currencies.filter(currency => currency !== state.info.base)[0] :
+                    state.targetCurrency
+            }
+        case SET_TARGET_AMOUNT:
+            return {
+                ...state,
+                targetAmount: action.amount
             }
         default:
             return state

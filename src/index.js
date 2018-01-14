@@ -10,7 +10,7 @@ const store = createStore(
     applyMiddleware(thunk)
 )
 
-export default class ExchangerWidget extends Component {
+export default class ExchangeWidget extends Component {
     render() {
         return (
             <Provider store={store}>
