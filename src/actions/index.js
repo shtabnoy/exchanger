@@ -7,7 +7,6 @@ export const EXCHANGE_LOADING = 'EXCHANGE_LOADING'
 export const EXCHANGE_SUCCESS = 'EXCHANGE_SUCCESS'
 export const EXCHANGE_ERROR = 'EXCHANGE_ERROR'
 export const SET_TARGET_CURRENCY = 'SET_TARGET_CURRENCY'
-export const RESET_TARGET_CURRENCY = 'RESET_TARGET_CURRENCY'
 
 export const exchangeIsLoading = bool => ({
     type: 'EXCHANGE_LOADING',
@@ -29,12 +28,6 @@ export const setTargetCurrency = currency => ({
     currency
 })
 
-export const resetTargetCurrency = currency => ({
-    type: 'RESET_TARGET_CURRENCY',
-    currency
-})
-
-
 export const getExchangeRates = base => (dispatch) => {
     dispatch(exchangeIsLoading(true))
     fetch(`${BASE_URL}/latest?base=${base}`)
@@ -47,6 +40,5 @@ export const getExchangeRates = base => (dispatch) => {
         })
         .then(response => response.json())
         .then(response => dispatch(exchangeSuccess(response)))
-        .then(() => dispatch(resetTargetCurrency()))
         .catch(() => dispatch(exchangeError(true)))
 }

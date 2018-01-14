@@ -2,8 +2,7 @@ import {
     EXCHANGE_LOADING,
     EXCHANGE_SUCCESS,
     EXCHANGE_ERROR,
-    SET_TARGET_CURRENCY,
-    RESET_TARGET_CURRENCY
+    SET_TARGET_CURRENCY
 } from '../actions'
 
 const getDefaultState = () => ({
@@ -27,7 +26,10 @@ export default (state = getDefaultState(), action) => {
         case EXCHANGE_SUCCESS:
             return {
                 ...state,
-                exchangeData: action.exchangeData
+                exchangeData: action.exchangeData,
+                targetCurrency: action.exchangeData.base === state.targetCurrency ?
+                    state.currencies.filter(currency => currency !== action.exchangeData.base)[0] :
+                    state.targetCurrency
             }
         case EXCHANGE_ERROR:
             return {
@@ -38,13 +40,6 @@ export default (state = getDefaultState(), action) => {
             return {
                 ...state,
                 targetCurrency: action.currency
-            }
-        case RESET_TARGET_CURRENCY:
-            return {
-                ...state,
-                targetCurrency: state.exchangeData.base === state.targetCurrency ?
-                    state.currencies.filter(currency => currency !== state.exchangeData.base)[0] :
-                    state.targetCurrency
             }
         default:
             return state
