@@ -14,27 +14,29 @@ class App extends Component {
         setTargetCurrency: PropTypes.func.isRequired,
         // isLoading: PropTypes.bool.isRequired,
         // isError: PropTypes.bool.isRequired,
-        info: PropTypes.shape().isRequired,
+        baseCurrency: PropTypes.string.isRequired,
+        rates: PropTypes.shape({
+            [PropTypes.string]: PropTypes.number
+        }).isRequired,
         currencies: PropTypes.arrayOf(PropTypes.string).isRequired,
         targetCurrency: PropTypes.string.isRequired
     }
 
     state = {
         baseValue: 0
-        // amountTo: 0
     }
 
     componentDidMount() {
-        this.props.getExchangeRates(this.getBase())
+        this.props.getExchangeRates(this.getBaseCurrency())
     }
 
-    getBase = () => this.props.info.base
+    getBaseCurrency = () => this.props.baseCurrency
 
     // TODO: Refactor next and previous
     getNextBase = () => {
         const { currencies } = this.props
         const len = currencies.length
-        const nextCurrencyIndex = currencies.indexOf(this.getBase()) + 1
+        const nextCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) + 1
         this.props.getExchangeRates(currencies[((nextCurrencyIndex % len) + len) % len])
     }
 
@@ -42,7 +44,7 @@ class App extends Component {
     getPreviousBase = () => {
         const { currencies } = this.props
         const len = currencies.length
-        const previousCurrencyIndex = currencies.indexOf(this.getBase()) - 1
+        const previousCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) - 1
         this.props.getExchangeRates(currencies[((previousCurrencyIndex % len) + len) % len])
     }
 
@@ -52,7 +54,7 @@ class App extends Component {
     // TODO: Refactor nextTargetCurrency and previousTargetCurrency
     getNextTarget = () => {
         const filteredCurrencies =
-            this.props.currencies.filter(currency => currency !== this.getBase())
+            this.props.currencies.filter(currency => currency !== this.getBaseCurrency())
         const len = filteredCurrencies.length
         const index = filteredCurrencies.indexOf(this.getTargetCurrency()) + 1
         const targetCurrency = filteredCurrencies[((index % len) + len) % len]
@@ -62,7 +64,7 @@ class App extends Component {
     // TODO: Refactor nextTargetCurrency and previousTargetCurrency
     getPreviousTarget = () => {
         const filteredCurrencies =
-            this.props.currencies.filter(currency => currency !== this.getBase())
+            this.props.currencies.filter(currency => currency !== this.getBaseCurrency())
         const len = filteredCurrencies.length
         const index = filteredCurrencies.indexOf(this.getTargetCurrency()) - 1
         const targetCurrency = filteredCurrencies[((index % len) + len) % len]
@@ -70,7 +72,7 @@ class App extends Component {
     }
 
     getRate = (currency) => {
-        const { info: { rates } } = this.props
+        const { rates } = this.props
         return rates ? rates[currency] : 0
     }
 
@@ -79,18 +81,39 @@ class App extends Component {
         const targetCurrency = this.getTargetCurrency()
         return (
             <div id="rate" className="currency-block">
-                1 {this.getBase()} = {this.getRate(targetCurrency)} {targetCurrency}
+                1 {this.getBaseCurrency()} = {this.getRate(targetCurrency)} {targetCurrency}
             </div>
         )
     }
 
     handleChange = (event) => {
         const value = event.target.value
-        // TODO: Move to redux
         this.setState({
             baseValue: value
         })
-        // this.props.setTargetAmount((this.getRate(this.getTargetCurrency()) * value).toFixed(2))
+    }
+
+    renderBaseBlock = () => {
+        const { baseValue } = this.state
+        return (
+            <div id="from" className="currency-block">
+                <button className="btn" onClick={this.getPreviousBase}>
+                    <FontTriangle direction="left" />
+                </button>
+                {this.getBaseCurrency()}
+                {' '}
+                <input
+                    type="number"
+                    from="0"
+                    step="0.01"
+                    value={baseValue}
+                    onChange={this.handleChange}
+                />
+                <button className="btn" onClick={this.getNextBase}>
+                    <FontTriangle direction="right" />
+                </button>
+            </div>
+        )
     }
 
     renderTargetBlock = () => {
@@ -103,7 +126,6 @@ class App extends Component {
                 </button>
                 {targetCurrency}
                 {' '}
-                {/* {this.props.targetAmount} */}
                 {(this.getRate(targetCurrency) * baseValue).toFixed(2)}
                 <button className="btn" onClick={this.getNextTarget}>
                     <FontTriangle direction="right" />
@@ -115,27 +137,10 @@ class App extends Component {
     // TODO: Disable buttons until request is finished
     // TODO: Add error displaying
     render() {
-        const { baseValue } = this.state
         return (
             <div>
                 {this.currentRateSection()}
-                <div id="from" className="currency-block">
-                    <button className="btn" onClick={this.getPreviousBase}>
-                        <FontTriangle direction="left" />
-                    </button>
-                    {this.getBase()}
-                    {' '}
-                    <input
-                        type="number"
-                        from="0"
-                        step="0.01"
-                        value={baseValue}
-                        onChange={this.handleChange}
-                    />
-                    <button className="btn" onClick={this.getNextBase}>
-                        <FontTriangle direction="right" />
-                    </button>
-                </div>
+                {this.renderBaseBlock()}
                 {this.renderTargetBlock()}
             </div>
         )
@@ -145,7 +150,8 @@ class App extends Component {
 const mapStateToProps = state => ({
     currencies: state.Exchange.currencies,
     targetCurrency: state.Exchange.targetCurrency,
-    info: state.Exchange.info,
+    baseCurrency: state.Exchange.exchangeData.base,
+    rates: state.Exchange.exchangeData.rates,
     isLoading: state.Exchange.isLoading,
     isError: state.Exchange.isError
 })

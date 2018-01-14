@@ -8,8 +8,9 @@ import {
 
 const getDefaultState = () => ({
     currencies: ['USD', 'EUR', 'GBP'],
-    info: {
-        base: 'USD'
+    exchangeData: {
+        base: 'USD',
+        rates: {}
     },
     targetCurrency: 'EUR',
     isLoading: false,
@@ -26,7 +27,7 @@ export default (state = getDefaultState(), action) => {
         case EXCHANGE_SUCCESS:
             return {
                 ...state,
-                info: action.info
+                exchangeData: action.exchangeData
             }
         case EXCHANGE_ERROR:
             return {
@@ -41,8 +42,8 @@ export default (state = getDefaultState(), action) => {
         case RESET_TARGET_CURRENCY:
             return {
                 ...state,
-                targetCurrency: state.info.base === state.targetCurrency ?
-                    state.currencies.filter(currency => currency !== state.info.base)[0] :
+                targetCurrency: state.exchangeData.base === state.targetCurrency ?
+                    state.currencies.filter(currency => currency !== state.exchangeData.base)[0] :
                     state.targetCurrency
             }
         default:

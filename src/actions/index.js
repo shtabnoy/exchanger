@@ -14,9 +14,9 @@ export const exchangeIsLoading = bool => ({
     isLoading: bool
 })
 
-export const exchangeSuccess = info => ({
+export const exchangeSuccess = exchangeData => ({
     type: 'EXCHANGE_SUCCESS',
-    info
+    exchangeData
 })
 
 export const exchangeError = bool => ({
