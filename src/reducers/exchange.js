@@ -3,8 +3,7 @@ import {
     EXCHANGE_SUCCESS,
     EXCHANGE_ERROR,
     SET_TARGET_CURRENCY,
-    RESET_TARGET_CURRENCY,
-    SET_TARGET_AMOUNT
+    RESET_TARGET_CURRENCY
 } from '../actions'
 
 const getDefaultState = () => ({
@@ -13,7 +12,6 @@ const getDefaultState = () => ({
         base: 'USD'
     },
     targetCurrency: 'EUR',
-    targetAmount: '0.00',
     isLoading: false,
     isError: false
 })
@@ -46,11 +44,6 @@ export default (state = getDefaultState(), action) => {
                 targetCurrency: state.info.base === state.targetCurrency ?
                     state.currencies.filter(currency => currency !== state.info.base)[0] :
                     state.targetCurrency
-            }
-        case SET_TARGET_AMOUNT:
-            return {
-                ...state,
-                targetAmount: action.amount
             }
         default:
             return state

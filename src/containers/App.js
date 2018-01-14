@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
     getExchangeRates,
-    setTargetCurrency,
-    setTargetAmount,
-    updateTarget
+    setTargetCurrency
 } from '../actions'
 import FontTriangle from '../components/FontTriangle'
 import './App.scss'
@@ -14,18 +12,15 @@ class App extends Component {
     static propTypes = {
         getExchangeRates: PropTypes.func.isRequired,
         setTargetCurrency: PropTypes.func.isRequired,
-        setTargetAmount: PropTypes.func.isRequired,
-        updateTarget: PropTypes.func.isRequired,
         // isLoading: PropTypes.bool.isRequired,
         // isError: PropTypes.bool.isRequired,
         info: PropTypes.shape().isRequired,
         currencies: PropTypes.arrayOf(PropTypes.string).isRequired,
-        targetCurrency: PropTypes.string.isRequired,
-        targetAmount: PropTypes.string.isRequired
+        targetCurrency: PropTypes.string.isRequired
     }
 
     state = {
-        amountFrom: 0
+        baseValue: 0
         // amountTo: 0
     }
 
@@ -61,7 +56,7 @@ class App extends Component {
         const len = filteredCurrencies.length
         const index = filteredCurrencies.indexOf(this.getTargetCurrency()) + 1
         const targetCurrency = filteredCurrencies[((index % len) + len) % len]
-        this.props.updateTarget(targetCurrency, this.state.amountFrom, this.getRate(targetCurrency))
+        this.props.setTargetCurrency(targetCurrency)
     }
 
     // TODO: Refactor nextTargetCurrency and previousTargetCurrency
@@ -71,7 +66,7 @@ class App extends Component {
         const len = filteredCurrencies.length
         const index = filteredCurrencies.indexOf(this.getTargetCurrency()) - 1
         const targetCurrency = filteredCurrencies[((index % len) + len) % len]
-        this.props.updateTarget(targetCurrency, this.state.amountFrom, this.getRate(targetCurrency))
+        this.props.setTargetCurrency(targetCurrency)
     }
 
     getRate = (currency) => {
@@ -93,16 +88,34 @@ class App extends Component {
         const value = event.target.value
         // TODO: Move to redux
         this.setState({
-            amountFrom: value
+            baseValue: value
         })
-        this.props.setTargetAmount((this.getRate(this.getTargetCurrency()) * value).toFixed(2))
+        // this.props.setTargetAmount((this.getRate(this.getTargetCurrency()) * value).toFixed(2))
+    }
+
+    renderTargetBlock = () => {
+        const targetCurrency = this.getTargetCurrency()
+        const { baseValue } = this.state
+        return (
+            <div id="to" className="currency-block">
+                <button className="btn" onClick={this.getPreviousTarget}>
+                    <FontTriangle direction="left" />
+                </button>
+                {targetCurrency}
+                {' '}
+                {/* {this.props.targetAmount} */}
+                {(this.getRate(targetCurrency) * baseValue).toFixed(2)}
+                <button className="btn" onClick={this.getNextTarget}>
+                    <FontTriangle direction="right" />
+                </button>
+            </div>
+        )
     }
 
     // TODO: Disable buttons until request is finished
     // TODO: Add error displaying
     render() {
-        const { amountFrom } = this.state
-        console.log('rerender')
+        const { baseValue } = this.state
         return (
             <div>
                 {this.currentRateSection()}
@@ -116,24 +129,14 @@ class App extends Component {
                         type="number"
                         from="0"
                         step="0.01"
-                        value={amountFrom}
+                        value={baseValue}
                         onChange={this.handleChange}
                     />
                     <button className="btn" onClick={this.getNextBase}>
                         <FontTriangle direction="right" />
                     </button>
                 </div>
-                <div id="to" className="currency-block">
-                    <button className="btn" onClick={this.getPreviousTarget}>
-                        <FontTriangle direction="left" />
-                    </button>
-                    {this.getTargetCurrency()}
-                    {' '}
-                    {this.props.targetAmount}
-                    <button className="btn" onClick={this.getNextTarget}>
-                        <FontTriangle direction="right" />
-                    </button>
-                </div>
+                {this.renderTargetBlock()}
             </div>
         )
     }
@@ -142,7 +145,6 @@ class App extends Component {
 const mapStateToProps = state => ({
     currencies: state.Exchange.currencies,
     targetCurrency: state.Exchange.targetCurrency,
-    targetAmount: state.Exchange.targetAmount,
     info: state.Exchange.info,
     isLoading: state.Exchange.isLoading,
     isError: state.Exchange.isError
@@ -150,10 +152,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     getExchangeRates: base => dispatch(getExchangeRates(base)),
-    setTargetCurrency: currency => dispatch(setTargetCurrency(currency)),
-    setTargetAmount: amount => dispatch(setTargetAmount(amount)),
-    updateTarget: (targetCurrency, amountFrom, rate) =>
-        dispatch(updateTarget(targetCurrency, amountFrom, rate))
+    setTargetCurrency: currency => dispatch(setTargetCurrency(currency))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
