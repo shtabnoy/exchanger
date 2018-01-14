@@ -27,7 +27,11 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.props.getExchangeRates(this.getBaseCurrency())
+        this.startPoll(this.getBaseCurrency())
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout)
     }
 
     getBaseCurrency = () => this.props.baseCurrency
@@ -37,7 +41,7 @@ class App extends Component {
         const { currencies } = this.props
         const len = currencies.length
         const nextCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) + 1
-        this.props.getExchangeRates(currencies[((nextCurrencyIndex % len) + len) % len])
+        this.startPoll(currencies[((nextCurrencyIndex % len) + len) % len])
     }
 
     // TODO: Refactor next and previous
@@ -45,7 +49,7 @@ class App extends Component {
         const { currencies } = this.props
         const len = currencies.length
         const previousCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) - 1
-        this.props.getExchangeRates(currencies[((previousCurrencyIndex % len) + len) % len])
+        this.startPoll(currencies[((previousCurrencyIndex % len) + len) % len])
     }
 
     // TODO: Refactor TargetCurrency
@@ -71,9 +75,12 @@ class App extends Component {
         this.props.setTargetCurrency(targetCurrency)
     }
 
-    getRate = (currency) => {
-        const { rates } = this.props
-        return rates ? rates[currency] : 0
+    getRate = currency => (this.props.rates ? this.props.rates[currency] : 0)
+
+    startPoll = (baseCurrency) => {
+        this.props.getExchangeRates(baseCurrency)
+        clearTimeout(this.timeout)
+        this.timeout = setTimeout(() => this.startPoll(baseCurrency), 10000)
     }
 
     // TODO: Create dumb component
@@ -87,9 +94,8 @@ class App extends Component {
     }
 
     handleChange = (event) => {
-        const value = event.target.value
         this.setState({
-            baseValue: value
+            baseValue: event.target.value
         })
     }
 
