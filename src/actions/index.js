@@ -8,6 +8,9 @@ export const EXCHANGE_SUCCESS = 'EXCHANGE_SUCCESS'
 export const EXCHANGE_ERROR = 'EXCHANGE_ERROR'
 export const SET_TARGET_CURRENCY = 'SET_TARGET_CURRENCY'
 
+const TIMEOUT = 10000
+let timer
+
 export const exchangeIsLoading = bool => ({
     type: 'EXCHANGE_LOADING',
     isLoading: bool
@@ -28,6 +31,10 @@ export const setTargetCurrency = currency => ({
     currency
 })
 
+export const stopPolling = () => {
+    clearTimeout(timer)
+}
+
 export const getExchangeRates = base => (dispatch) => {
     dispatch(exchangeIsLoading(true))
     fetch(`${BASE_URL}/latest?base=${base}`)
@@ -40,5 +47,9 @@ export const getExchangeRates = base => (dispatch) => {
         })
         .then(response => response.json())
         .then(response => dispatch(exchangeSuccess(response)))
+        .then(() => {
+            clearTimeout(timer)
+            timer = setTimeout(() => dispatch(getExchangeRates(base)), TIMEOUT)
+        })
         .catch(() => dispatch(exchangeError(true)))
 }

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
     getExchangeRates,
-    setTargetCurrency
+    setTargetCurrency,
+    stopPolling
 } from '../actions'
 import FontTriangle from '../components/FontTriangle'
 import './App.scss'
@@ -12,6 +13,7 @@ class App extends Component {
     static propTypes = {
         getExchangeRates: PropTypes.func.isRequired,
         setTargetCurrency: PropTypes.func.isRequired,
+        stopPolling: PropTypes.func.isRequired,
         // isLoading: PropTypes.bool.isRequired,
         // isError: PropTypes.bool.isRequired,
         baseCurrency: PropTypes.string.isRequired,
@@ -27,11 +29,7 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.startPoll(this.getBaseCurrency())
-    }
-
-    componentWillUnmount() {
-        clearTimeout(this.timeout)
+        this.props.getExchangeRates(this.getBaseCurrency())
     }
 
     getBaseCurrency = () => this.props.baseCurrency
@@ -41,7 +39,7 @@ class App extends Component {
         const { currencies } = this.props
         const len = currencies.length
         const nextCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) + 1
-        this.startPoll(currencies[((nextCurrencyIndex % len) + len) % len])
+        this.props.getExchangeRates(currencies[((nextCurrencyIndex % len) + len) % len])
     }
 
     // TODO: Refactor next and previous
@@ -49,7 +47,7 @@ class App extends Component {
         const { currencies } = this.props
         const len = currencies.length
         const previousCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) - 1
-        this.startPoll(currencies[((previousCurrencyIndex % len) + len) % len])
+        this.props.getExchangeRates(currencies[((previousCurrencyIndex % len) + len) % len])
     }
 
     // TODO: Refactor TargetCurrency
@@ -77,11 +75,11 @@ class App extends Component {
 
     getRate = currency => (this.props.rates ? this.props.rates[currency] : 0)
 
-    startPoll = (baseCurrency) => {
-        this.props.getExchangeRates(baseCurrency)
-        clearTimeout(this.timeout)
-        this.timeout = setTimeout(() => this.startPoll(baseCurrency), 10000)
-    }
+    // startPoll = (baseCurrency) => {
+    //     this.props.getExchangeRates(baseCurrency)
+    //     clearTimeout(this.timeout)
+    //     this.timeout = setTimeout(() => this.startPoll(baseCurrency), 10000)
+    // }
 
     // TODO: Create dumb component
     currentRateSection = () => {
@@ -148,6 +146,9 @@ class App extends Component {
                 {this.currentRateSection()}
                 {this.renderBaseBlock()}
                 {this.renderTargetBlock()}
+                <button onClick={this.props.stopPolling}>
+                    Stop polling
+                </button>
             </div>
         )
     }
@@ -164,7 +165,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     getExchangeRates: base => dispatch(getExchangeRates(base)),
-    setTargetCurrency: currency => dispatch(setTargetCurrency(currency))
+    setTargetCurrency: currency => dispatch(setTargetCurrency(currency)),
+    stopPolling
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
