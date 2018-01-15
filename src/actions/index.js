@@ -6,7 +6,8 @@ const BASE_URL = 'https://api.fixer.io'
 export const EXCHANGE_LOADING = 'EXCHANGE_LOADING'
 export const EXCHANGE_SUCCESS = 'EXCHANGE_SUCCESS'
 export const EXCHANGE_ERROR = 'EXCHANGE_ERROR'
-export const SET_TARGET_CURRENCY = 'SET_TARGET_CURRENCY'
+export const UPDATE_TARGET_CURRENCY = 'UPDATE_TARGET_CURRENCY'
+export const UPDATE_BASE_VALUE = 'UPDATE_BASE_VALUE'
 
 const TIMEOUT = 10000
 let timer
@@ -26,9 +27,14 @@ export const exchangeError = bool => ({
     isError: bool
 })
 
-export const setTargetCurrency = currency => ({
-    type: 'SET_TARGET_CURRENCY',
+export const updateTargetCurrency = currency => ({
+    type: 'UPDATE_TARGET_CURRENCY',
     currency
+})
+
+export const updateBaseValue = value => ({
+    type: 'UPDATE_BASE_VALUE',
+    value
 })
 
 export const stopPolling = () => {

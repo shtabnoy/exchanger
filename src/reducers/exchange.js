@@ -2,7 +2,8 @@ import {
     EXCHANGE_LOADING,
     EXCHANGE_SUCCESS,
     EXCHANGE_ERROR,
-    SET_TARGET_CURRENCY
+    UPDATE_TARGET_CURRENCY,
+    UPDATE_BASE_VALUE
 } from '../actions'
 
 const getDefaultState = () => ({
@@ -11,6 +12,7 @@ const getDefaultState = () => ({
         base: 'USD',
         rates: {}
     },
+    baseValue: 0,
     targetCurrency: 'EUR',
     isLoading: false,
     isError: false
@@ -36,10 +38,15 @@ export default (state = getDefaultState(), action) => {
                 ...state,
                 isError: action.isError
             }
-        case SET_TARGET_CURRENCY:
+        case UPDATE_TARGET_CURRENCY:
             return {
                 ...state,
                 targetCurrency: action.currency
+            }
+        case UPDATE_BASE_VALUE:
+            return {
+                ...state,
+                baseValue: action.value
             }
         default:
             return state

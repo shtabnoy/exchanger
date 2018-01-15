@@ -3,20 +3,25 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
     getExchangeRates,
-    setTargetCurrency,
+    updateTargetCurrency,
+    updateBaseValue,
     stopPolling
 } from '../actions'
-import FontTriangle from '../components/FontTriangle'
+import RateBlock from '../components/RateBlock'
+import BaseBlock from '../components/BaseBlock'
+import TargetBlock from '../components/TargetBlock'
 import './App.scss'
 
 class App extends Component {
     static propTypes = {
         getExchangeRates: PropTypes.func.isRequired,
-        setTargetCurrency: PropTypes.func.isRequired,
+        updateTargetCurrency: PropTypes.func.isRequired,
+        updateBaseValue: PropTypes.func.isRequired,
         stopPolling: PropTypes.func.isRequired,
         // isLoading: PropTypes.bool.isRequired,
         // isError: PropTypes.bool.isRequired,
         baseCurrency: PropTypes.string.isRequired,
+        baseValue: PropTypes.number.isRequired,
         rates: PropTypes.shape({
             [PropTypes.string]: PropTypes.number
         }).isRequired,
@@ -24,128 +29,77 @@ class App extends Component {
         targetCurrency: PropTypes.string.isRequired
     }
 
-    state = {
-        baseValue: 0
-    }
-
     componentDidMount() {
-        this.props.getExchangeRates(this.getBaseCurrency())
+        this.props.getExchangeRates(this.props.baseCurrency)
     }
-
-    getBaseCurrency = () => this.props.baseCurrency
 
     // TODO: Refactor next and previous
     getNextBase = () => {
-        const { currencies } = this.props
+        const { currencies, baseCurrency } = this.props
         const len = currencies.length
-        const nextCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) + 1
+        const nextCurrencyIndex = currencies.indexOf(baseCurrency) + 1
         this.props.getExchangeRates(currencies[((nextCurrencyIndex % len) + len) % len])
     }
 
     // TODO: Refactor next and previous
     getPreviousBase = () => {
-        const { currencies } = this.props
+        const { currencies, baseCurrency } = this.props
         const len = currencies.length
-        const previousCurrencyIndex = currencies.indexOf(this.getBaseCurrency()) - 1
+        const previousCurrencyIndex = currencies.indexOf(baseCurrency) - 1
         this.props.getExchangeRates(currencies[((previousCurrencyIndex % len) + len) % len])
     }
-
-    // TODO: Refactor TargetCurrency
-    getTargetCurrency = () => this.props.targetCurrency
 
     // TODO: Refactor nextTargetCurrency and previousTargetCurrency
     getNextTarget = () => {
         const filteredCurrencies =
-            this.props.currencies.filter(currency => currency !== this.getBaseCurrency())
+            this.props.currencies.filter(currency => currency !== this.props.baseCurrency)
         const len = filteredCurrencies.length
-        const index = filteredCurrencies.indexOf(this.getTargetCurrency()) + 1
+        const index = filteredCurrencies.indexOf(this.props.targetCurrency) + 1
         const targetCurrency = filteredCurrencies[((index % len) + len) % len]
-        this.props.setTargetCurrency(targetCurrency)
+        this.props.updateTargetCurrency(targetCurrency)
     }
 
     // TODO: Refactor nextTargetCurrency and previousTargetCurrency
     getPreviousTarget = () => {
         const filteredCurrencies =
-            this.props.currencies.filter(currency => currency !== this.getBaseCurrency())
+            this.props.currencies.filter(currency => currency !== this.props.baseCurrency)
         const len = filteredCurrencies.length
-        const index = filteredCurrencies.indexOf(this.getTargetCurrency()) - 1
+        const index = filteredCurrencies.indexOf(this.props.targetCurrency) - 1
         const targetCurrency = filteredCurrencies[((index % len) + len) % len]
-        this.props.setTargetCurrency(targetCurrency)
-    }
-
-    getRate = currency => (this.props.rates ? this.props.rates[currency] : 0)
-
-    // startPoll = (baseCurrency) => {
-    //     this.props.getExchangeRates(baseCurrency)
-    //     clearTimeout(this.timeout)
-    //     this.timeout = setTimeout(() => this.startPoll(baseCurrency), 10000)
-    // }
-
-    // TODO: Create dumb component
-    currentRateSection = () => {
-        const targetCurrency = this.getTargetCurrency()
-        return (
-            <div id="rate" className="currency-block">
-                1 {this.getBaseCurrency()} = {this.getRate(targetCurrency)} {targetCurrency}
-            </div>
-        )
-    }
-
-    handleChange = (event) => {
-        this.setState({
-            baseValue: event.target.value
-        })
-    }
-
-    renderBaseBlock = () => {
-        const { baseValue } = this.state
-        return (
-            <div id="from" className="currency-block">
-                <button className="btn" onClick={this.getPreviousBase}>
-                    <FontTriangle direction="left" />
-                </button>
-                {this.getBaseCurrency()}
-                {' '}
-                <input
-                    type="number"
-                    from="0"
-                    step="0.01"
-                    value={baseValue}
-                    onChange={this.handleChange}
-                />
-                <button className="btn" onClick={this.getNextBase}>
-                    <FontTriangle direction="right" />
-                </button>
-            </div>
-        )
-    }
-
-    renderTargetBlock = () => {
-        const targetCurrency = this.getTargetCurrency()
-        const { baseValue } = this.state
-        return (
-            <div id="to" className="currency-block">
-                <button className="btn" onClick={this.getPreviousTarget}>
-                    <FontTriangle direction="left" />
-                </button>
-                {targetCurrency}
-                {' '}
-                {(this.getRate(targetCurrency) * baseValue).toFixed(2)}
-                <button className="btn" onClick={this.getNextTarget}>
-                    <FontTriangle direction="right" />
-                </button>
-            </div>
-        )
+        this.props.updateTargetCurrency(targetCurrency)
     }
 
     // TODO: Disable buttons until request is finished
     // TODO: Add error displaying
     render() {
+        const {
+            baseCurrency,
+            baseValue,
+            targetCurrency,
+            rates
+        } = this.props
+
         return (
             <div>
-                {this.currentRateSection()}
-                {this.renderBaseBlock()}
-                {this.renderTargetBlock()}
+                <RateBlock
+                    baseCurrency={baseCurrency}
+                    targetCurrency={targetCurrency}
+                    rate={rates[targetCurrency]}
+                />
+                <BaseBlock
+                    baseCurrency={baseCurrency}
+                    baseValue={baseValue}
+                    updateBaseValue={this.props.updateBaseValue}
+                    getPreviousBase={this.getPreviousBase}
+                    getNextBase={this.getNextBase}
+                />
+                <TargetBlock
+                    baseValue={baseValue}
+                    targetCurrency={targetCurrency}
+                    rate={rates[targetCurrency]}
+                    getPreviousTarget={this.getPreviousTarget}
+                    getNextTarget={this.getNextTarget}
+                />
                 <button onClick={this.props.stopPolling}>
                     Stop polling
                 </button>
@@ -158,15 +112,17 @@ const mapStateToProps = state => ({
     currencies: state.Exchange.currencies,
     targetCurrency: state.Exchange.targetCurrency,
     baseCurrency: state.Exchange.exchangeData.base,
+    baseValue: state.Exchange.baseValue,
     rates: state.Exchange.exchangeData.rates,
     isLoading: state.Exchange.isLoading,
     isError: state.Exchange.isError
 })
 
-const mapDispatchToProps = dispatch => ({
-    getExchangeRates: base => dispatch(getExchangeRates(base)),
-    setTargetCurrency: currency => dispatch(setTargetCurrency(currency)),
+const mapDispatchToProps = {
+    getExchangeRates,
+    updateTargetCurrency,
+    updateBaseValue,
     stopPolling
-})
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
