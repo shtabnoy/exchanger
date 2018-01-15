@@ -15,7 +15,7 @@ const getDefaultState = () => ({
     baseValue: 0,
     targetCurrency: 'EUR',
     isLoading: false,
-    isError: false
+    error: ''
 })
 
 export default (state = getDefaultState(), action) => {
@@ -31,12 +31,13 @@ export default (state = getDefaultState(), action) => {
                 exchangeData: action.exchangeData,
                 targetCurrency: action.exchangeData.base === state.targetCurrency ?
                     state.currencies.filter(currency => currency !== action.exchangeData.base)[0] :
-                    state.targetCurrency
+                    state.targetCurrency,
+                error: ''
             }
         case EXCHANGE_ERROR:
             return {
                 ...state,
-                isError: action.isError
+                error: action.error
             }
         case UPDATE_TARGET_CURRENCY:
             return {

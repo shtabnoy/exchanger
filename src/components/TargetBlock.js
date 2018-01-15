@@ -6,9 +6,10 @@ const TargetBlock = ({
     baseValue,
     rate,
     getTarget,
-    disabled
+    disabled,
+    className
 }) => (
-    <div id="to" className="currency-block">
+    <div id="to" className={className}>
         <button
             className="btn"
             onClick={() => getTarget('previous')}
@@ -30,13 +31,15 @@ const TargetBlock = ({
 TargetBlock.propTypes = {
     baseValue: PropTypes.number.isRequired,
     targetCurrency: PropTypes.string.isRequired,
-    rate: PropTypes.number.isRequired,
+    rate: PropTypes.number,
     getTarget: PropTypes.func.isRequired,
-    disabled: PropTypes.bool.isRequired
+    disabled: PropTypes.bool.isRequired,
+    className: PropTypes.string
 }
 
 TargetBlock.defaultProps = {
-    rate: 0
+    rate: 0,
+    className: ''
 }
 
 export default TargetBlock

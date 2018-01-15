@@ -22,9 +22,9 @@ export const exchangeSuccess = exchangeData => ({
     exchangeData
 })
 
-export const exchangeError = bool => ({
+export const exchangeError = error => ({
     type: 'EXCHANGE_ERROR',
-    isError: bool
+    error
 })
 
 export const updateTargetCurrency = currency => ({
@@ -45,10 +45,10 @@ export const getExchangeRates = base => (dispatch) => {
     dispatch(exchangeIsLoading(true))
     fetch(`${BASE_URL}/latest?base=${base}`)
         .then((response) => {
+            dispatch(exchangeIsLoading(false))
             if (!response.ok) {
                 throw Error(response.statusText)
             }
-            dispatch(exchangeIsLoading(false))
             return response
         })
         .then(response => response.json())
@@ -57,5 +57,5 @@ export const getExchangeRates = base => (dispatch) => {
             clearTimeout(timer)
             timer = setTimeout(() => dispatch(getExchangeRates(base)), TIMEOUT)
         })
-        .catch(() => dispatch(exchangeError(true)))
+        .catch((err) => dispatch(exchangeError(`Error: ${err.message}`)))
 }

@@ -4,9 +4,10 @@ import PropTypes from 'prop-types'
 const RateBlock = ({
     baseCurrency,
     targetCurrency,
-    rate
+    rate,
+    className
 }) => (
-    <div id="rate" className="currency-block">
+    <div id="rate" className={className}>
         {`1 ${baseCurrency} = ${rate} ${targetCurrency}`}
     </div>
 )
@@ -14,11 +15,13 @@ const RateBlock = ({
 RateBlock.propTypes = {
     baseCurrency: PropTypes.string.isRequired,
     targetCurrency: PropTypes.string.isRequired,
-    rate: PropTypes.number.isRequired
+    rate: PropTypes.number,
+    className: PropTypes.string
 }
 
 RateBlock.defaultProps = {
-    rate: 0
+    rate: 0,
+    className: ''
 }
 
 export default RateBlock

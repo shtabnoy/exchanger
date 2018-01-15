@@ -1,15 +1,17 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import RateBlock from '../components/RateBlock'
+import BaseBlock from '../components/BaseBlock'
+import TargetBlock from '../components/TargetBlock'
+import ErrorBlock from '../components/ErrorBlock';
+import InfoBlock from '../components/InfoBlock';
 import {
     getExchangeRates,
     updateTargetCurrency,
     updateBaseValue,
     stopPolling
 } from '../actions'
-import RateBlock from '../components/RateBlock'
-import BaseBlock from '../components/BaseBlock'
-import TargetBlock from '../components/TargetBlock'
 import './App.scss'
 
 class App extends Component {
@@ -19,7 +21,7 @@ class App extends Component {
         updateBaseValue: PropTypes.func.isRequired,
         stopPolling: PropTypes.func.isRequired,
         isLoading: PropTypes.bool.isRequired,
-        // isError: PropTypes.bool.isRequired,
+        error: PropTypes.string.isRequired,
         baseCurrency: PropTypes.string.isRequired,
         baseValue: PropTypes.number.isRequired,
         rates: PropTypes.shape({
@@ -30,7 +32,7 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.props.getExchangeRates(this.props.baseCurrency)
+        this.startPolling()
     }
 
     getBase = (direction) => {
@@ -52,23 +54,36 @@ class App extends Component {
         updateTargetCurrency(filteredCurrencies[((index % len) + len) % len])
     }
 
-    // TODO: Add error displaying
+    startPolling = () => this.props.getExchangeRates(this.props.baseCurrency)
+
     render() {
         const {
             baseCurrency,
             baseValue,
             targetCurrency,
             rates,
-            isLoading
+            isLoading,
+            error
         } = this.props
         return (
             <div>
+                <ErrorBlock 
+                    className="block error-block"
+                    error={error}
+                />
+                <InfoBlock
+                    className="block"
+                    startPolling={this.startPolling}
+                    stopPolling={this.props.stopPolling}
+                />
                 <RateBlock
+                    className="block currency-block"
                     baseCurrency={baseCurrency}
                     targetCurrency={targetCurrency}
                     rate={rates[targetCurrency]}
                 />
                 <BaseBlock
+                    className="block currency-block"
                     disabled={isLoading}
                     baseCurrency={baseCurrency}
                     baseValue={baseValue}
@@ -76,15 +91,13 @@ class App extends Component {
                     getBase={this.getBase}
                 />
                 <TargetBlock
+                    className="block currency-block"
                     disabled={isLoading}
                     baseValue={baseValue}
                     targetCurrency={targetCurrency}
                     rate={rates[targetCurrency]}
                     getTarget={this.getTarget}
                 />
-                <button onClick={this.props.stopPolling}>
-                    Stop
-                </button>
             </div>
         )
     }
@@ -97,7 +110,7 @@ const mapStateToProps = state => ({
     baseValue: state.Exchange.baseValue,
     rates: state.Exchange.exchangeData.rates,
     isLoading: state.Exchange.isLoading,
-    isError: state.Exchange.isError
+    error: state.Exchange.error
 })
 
 const mapDispatchToProps = (dispatch) => ({

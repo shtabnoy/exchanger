@@ -6,9 +6,10 @@ const BaseBlock = ({
     baseValue,
     getBase,
     updateBaseValue,
-    disabled
+    disabled,
+    className
 }) => (
-    <div id="from" className="currency-block">
+    <div id="from" className={className}>
         <button
             className="btn"
             onClick={() => getBase('previous')}
@@ -39,7 +40,12 @@ BaseBlock.propTypes = {
     baseValue: PropTypes.number.isRequired,
     getBase: PropTypes.func.isRequired,
     updateBaseValue: PropTypes.func.isRequired,
-    disabled: PropTypes.bool.isRequired
+    disabled: PropTypes.bool.isRequired,
+    className: PropTypes.string
+}
+
+BaseBlock.defaultProps = {
+    className: ''
 }
 
 export default BaseBlock
