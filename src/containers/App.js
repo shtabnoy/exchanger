@@ -18,7 +18,7 @@ class App extends Component {
         updateTargetCurrency: PropTypes.func.isRequired,
         updateBaseValue: PropTypes.func.isRequired,
         stopPolling: PropTypes.func.isRequired,
-        // isLoading: PropTypes.bool.isRequired,
+        isLoading: PropTypes.bool.isRequired,
         // isError: PropTypes.bool.isRequired,
         baseCurrency: PropTypes.string.isRequired,
         baseValue: PropTypes.number.isRequired,
@@ -33,52 +33,34 @@ class App extends Component {
         this.props.getExchangeRates(this.props.baseCurrency)
     }
 
-    // TODO: Refactor next and previous
-    getNextBase = () => {
-        const { currencies, baseCurrency } = this.props
+    getBase = (direction) => {
+        const { currencies, baseCurrency, getExchangeRates } = this.props
         const len = currencies.length
-        const nextCurrencyIndex = currencies.indexOf(baseCurrency) + 1
-        this.props.getExchangeRates(currencies[((nextCurrencyIndex % len) + len) % len])
+        let index = currencies.indexOf(baseCurrency)
+        if (direction === 'next') index++
+        if (direction === 'previous') index--
+        getExchangeRates(currencies[((index % len) + len) % len])
     }
 
-    // TODO: Refactor next and previous
-    getPreviousBase = () => {
-        const { currencies, baseCurrency } = this.props
-        const len = currencies.length
-        const previousCurrencyIndex = currencies.indexOf(baseCurrency) - 1
-        this.props.getExchangeRates(currencies[((previousCurrencyIndex % len) + len) % len])
-    }
-
-    // TODO: Refactor nextTargetCurrency and previousTargetCurrency
-    getNextTarget = () => {
-        const filteredCurrencies =
-            this.props.currencies.filter(currency => currency !== this.props.baseCurrency)
+    getTarget = (direction) => {
+        const { currencies, targetCurrency, baseCurrency, updateTargetCurrency } = this.props
+        const filteredCurrencies = currencies.filter(currency => currency !== baseCurrency)
         const len = filteredCurrencies.length
-        const index = filteredCurrencies.indexOf(this.props.targetCurrency) + 1
-        const targetCurrency = filteredCurrencies[((index % len) + len) % len]
-        this.props.updateTargetCurrency(targetCurrency)
+        let index = filteredCurrencies.indexOf(targetCurrency)
+        if (direction === 'next') index++
+        if (direction === 'previous') index--
+        updateTargetCurrency(filteredCurrencies[((index % len) + len) % len])
     }
 
-    // TODO: Refactor nextTargetCurrency and previousTargetCurrency
-    getPreviousTarget = () => {
-        const filteredCurrencies =
-            this.props.currencies.filter(currency => currency !== this.props.baseCurrency)
-        const len = filteredCurrencies.length
-        const index = filteredCurrencies.indexOf(this.props.targetCurrency) - 1
-        const targetCurrency = filteredCurrencies[((index % len) + len) % len]
-        this.props.updateTargetCurrency(targetCurrency)
-    }
-
-    // TODO: Disable buttons until request is finished
     // TODO: Add error displaying
     render() {
         const {
             baseCurrency,
             baseValue,
             targetCurrency,
-            rates
+            rates,
+            isLoading
         } = this.props
-
         return (
             <div>
                 <RateBlock
@@ -87,21 +69,21 @@ class App extends Component {
                     rate={rates[targetCurrency]}
                 />
                 <BaseBlock
+                    disabled={isLoading}
                     baseCurrency={baseCurrency}
                     baseValue={baseValue}
                     updateBaseValue={this.props.updateBaseValue}
-                    getPreviousBase={this.getPreviousBase}
-                    getNextBase={this.getNextBase}
+                    getBase={this.getBase}
                 />
                 <TargetBlock
+                    disabled={isLoading}
                     baseValue={baseValue}
                     targetCurrency={targetCurrency}
                     rate={rates[targetCurrency]}
-                    getPreviousTarget={this.getPreviousTarget}
-                    getNextTarget={this.getNextTarget}
+                    getTarget={this.getTarget}
                 />
                 <button onClick={this.props.stopPolling}>
-                    Stop polling
+                    Stop
                 </button>
             </div>
         )
@@ -118,11 +100,11 @@ const mapStateToProps = state => ({
     isError: state.Exchange.isError
 })
 
-const mapDispatchToProps = {
-    getExchangeRates,
-    updateTargetCurrency,
-    updateBaseValue,
-    stopPolling
-}
+const mapDispatchToProps = (dispatch) => ({
+    getExchangeRates: (base) => dispatch(getExchangeRates(base)),
+    updateTargetCurrency: (currency) => dispatch(updateTargetCurrency(currency)),
+    updateBaseValue: (value) => dispatch(updateBaseValue(value)),
+    stopPolling: () => dispatch(stopPolling)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
