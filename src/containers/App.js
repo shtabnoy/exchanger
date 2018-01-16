@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import RateBlock from '../components/RateBlock'
 import BaseBlock from '../components/BaseBlock'
 import TargetBlock from '../components/TargetBlock'
-import ErrorBlock from '../components/ErrorBlock';
-import InfoBlock from '../components/InfoBlock';
+import ErrorBlock from '../components/ErrorBlock'
+import InfoBlock from '../components/InfoBlock'
 import {
     getExchangeRates,
     updateTargetCurrency,
@@ -67,7 +67,7 @@ class App extends Component {
         } = this.props
         return (
             <div>
-                <ErrorBlock 
+                <ErrorBlock
                     className="block error-block"
                     error={error}
                 />
@@ -113,10 +113,10 @@ const mapStateToProps = state => ({
     error: state.Exchange.error
 })
 
-const mapDispatchToProps = (dispatch) => ({
-    getExchangeRates: (base) => dispatch(getExchangeRates(base)),
-    updateTargetCurrency: (currency) => dispatch(updateTargetCurrency(currency)),
-    updateBaseValue: (value) => dispatch(updateBaseValue(value)),
+const mapDispatchToProps = dispatch => ({
+    getExchangeRates: base => dispatch(getExchangeRates(base)),
+    updateTargetCurrency: currency => dispatch(updateTargetCurrency(currency)),
+    updateBaseValue: value => dispatch(updateBaseValue(value)),
     stopPolling: () => dispatch(stopPolling)
 })
 

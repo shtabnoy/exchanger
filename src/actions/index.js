@@ -1,7 +1,7 @@
 /* global fetch */
 import 'whatwg-fetch'
 
-const BASE_URL = 'https://api.fixer.io'
+export const BASE_URL = 'https://api.fixer.io'
 
 export const EXCHANGE_LOADING = 'EXCHANGE_LOADING'
 export const EXCHANGE_SUCCESS = 'EXCHANGE_SUCCESS'
@@ -43,7 +43,7 @@ export const stopPolling = () => {
 
 export const getExchangeRates = base => (dispatch) => {
     dispatch(exchangeIsLoading(true))
-    fetch(`${BASE_URL}/latest?base=${base}`)
+    return fetch(`${BASE_URL}/latest?base=${base}`)
         .then((response) => {
             dispatch(exchangeIsLoading(false))
             if (!response.ok) {
@@ -57,5 +57,5 @@ export const getExchangeRates = base => (dispatch) => {
             clearTimeout(timer)
             timer = setTimeout(() => dispatch(getExchangeRates(base)), TIMEOUT)
         })
-        .catch((err) => dispatch(exchangeError(`Error: ${err.message}`)))
+        .catch(err => dispatch(exchangeError(`Error: ${err.message}`)))
 }
