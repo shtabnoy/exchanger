@@ -6,7 +6,7 @@ import {
     UPDATE_BASE_VALUE
 } from '../actions'
 
-const getDefaultState = () => ({
+export const getDefaultState = () => ({
     currencies: ['USD', 'EUR', 'GBP'],
     exchangeData: {
         base: 'USD',

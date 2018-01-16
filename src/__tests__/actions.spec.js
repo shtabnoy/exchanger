@@ -83,9 +83,29 @@ describe('async actions', () => {
                 rates: {}
             }
         })
+
         fetchMock.getOnce(`${actions.BASE_URL}/latest?base=${base}`, {
             body: responseBody,
             headers: { 'content-type': 'application/json' }
+        })
+
+        return store.dispatch(actions.getExchangeRates(base)).then(() => {
+            expect(store.getActions()).toEqual(expectedActions)
+        })
+    })
+    it('creates EXCHANGE_ERROR 422 when trying to get rates for nonexisted base', () => {
+        const base = 'US'
+        const expectedActions = [
+            { type: actions.EXCHANGE_LOADING, isLoading: true },
+            { type: actions.EXCHANGE_LOADING, isLoading: false },
+            { type: actions.EXCHANGE_ERROR, error: 'Error: Unprocessable Entity' }
+        ]
+        const store = mockStore({})
+
+        fetchMock.getOnce(`${actions.BASE_URL}/latest?base=${base}`, {
+            body: { },
+            headers: { 'content-type': 'application/json' },
+            status: 422
         })
 
         return store.dispatch(actions.getExchangeRates(base)).then(() => {
