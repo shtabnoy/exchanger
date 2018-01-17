@@ -14,7 +14,7 @@ import {
 } from '../actions'
 import './App.scss'
 
-class App extends Component {
+export class App extends Component {
     static propTypes = {
         getExchangeRates: PropTypes.func.isRequired,
         updateTargetCurrency: PropTypes.func.isRequired,
@@ -66,12 +66,15 @@ class App extends Component {
             error
         } = this.props
         return (
-            <div>
+            <div id="app-container">
                 <ErrorBlock
                     className="block error-block"
                     error={error}
                 />
-                {/* Uncomment InfoBlock if you want to stop 10 seconds polling of server */}
+                {/*
+                    Uncomment InfoBlock if you want to have control to
+                    stop and restart 10 seconds polling of server
+                */}
                 {/* <InfoBlock
                     className="block"
                     startPolling={this.startPolling}

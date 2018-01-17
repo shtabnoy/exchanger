@@ -9,6 +9,12 @@
         "test:watch": "npm test -- --watch",
         "compile": "webpack"
     },
+    "jest": {
+        "transform": {
+            "^.+\\.js$": "babel-jest",
+            "^.+\\.(css|scss)$": "<rootDir>/node_modules/jest-css-modules"
+        }
+    },
     "keywords": [],
     "author": "shtabnoy",
     "license": "ISC",
@@ -43,6 +49,7 @@
         "fetch-mock": "^6.0.0-beta.7",
         "google-fonts-webpack-plugin": "^0.4.3",
         "jest": "^22.1.1",
+        "jest-css-modules": "^1.1.0",
         "node-sass": "^4.5.3",
         "redux-mock-store": "^1.4.0",
         "sass-loader": "^6.0.6",
