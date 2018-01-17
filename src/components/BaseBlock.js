@@ -17,7 +17,7 @@ const BaseBlock = ({
         >
             {'\u25c0'}
         </button>
-        {`${baseCurrency} `}
+        <span>{`${baseCurrency} `}</span>
         <input
             type="number"
             from="0"

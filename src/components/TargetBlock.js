@@ -17,7 +17,7 @@ const TargetBlock = ({
         >
             {'\u25c0'}
         </button>
-        {`${targetCurrency} ${(rate * baseValue).toFixed(2)}`}
+        <span>{`${targetCurrency} ${(rate * baseValue).toFixed(2)}`}</span>
         <button
             className="btn"
             onClick={() => getTarget('next')}

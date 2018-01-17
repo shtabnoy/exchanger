@@ -36,22 +36,22 @@ class App extends Component {
     }
 
     getBase = (direction) => {
-        const { currencies, baseCurrency, getExchangeRates } = this.props
+        const { currencies, baseCurrency } = this.props
         const len = currencies.length
         let index = currencies.indexOf(baseCurrency)
         if (direction === 'next') index++
         if (direction === 'previous') index--
-        getExchangeRates(currencies[((index % len) + len) % len])
+        this.props.getExchangeRates(currencies[((index % len) + len) % len])
     }
 
     getTarget = (direction) => {
-        const { currencies, targetCurrency, baseCurrency, updateTargetCurrency } = this.props
+        const { currencies, targetCurrency, baseCurrency } = this.props
         const filteredCurrencies = currencies.filter(currency => currency !== baseCurrency)
         const len = filteredCurrencies.length
         let index = filteredCurrencies.indexOf(targetCurrency)
         if (direction === 'next') index++
         if (direction === 'previous') index--
-        updateTargetCurrency(filteredCurrencies[((index % len) + len) % len])
+        this.props.updateTargetCurrency(filteredCurrencies[((index % len) + len) % len])
     }
 
     startPolling = () => this.props.getExchangeRates(this.props.baseCurrency)
@@ -71,11 +71,12 @@ class App extends Component {
                     className="block error-block"
                     error={error}
                 />
-                <InfoBlock
+                {/* Uncomment InfoBlock if you want to stop 10 seconds polling of server */}
+                {/* <InfoBlock
                     className="block"
                     startPolling={this.startPolling}
                     stopPolling={this.props.stopPolling}
-                />
+                /> */}
                 <RateBlock
                     className="block currency-block"
                     baseCurrency={baseCurrency}
