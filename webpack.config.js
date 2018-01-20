@@ -1,13 +1,12 @@
 const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-    entry: './src/index.js',
+    entry: ['./src/index.js', 'webpack-hot-middleware/client'],
     output: {
-        path: path.join(__dirname, 'lib'),
-        filename: 'exchanger.js',
-        library: 'exchanger',
-        libraryTarget: 'umd',
-        umdNamedDefine: true
+        path: path.join(__dirname, 'dist'),
+        filename: 'bundle.js'
     },
     module: {
         loaders: [
@@ -23,5 +22,11 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoEmitOnErrorsPlugin(),
+        new HtmlWebpackPlugin({
+            title: 'Exchange Widget',
+            template: 'template.index.ejs'
+        })
     ]
 }

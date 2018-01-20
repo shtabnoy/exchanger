@@ -1,26 +1,7 @@
 ## FX Exchanger Widget
 USD, EUR, GBP exchanger
 
-### Add widget to your project
-```
-package.json
-{
-    ...
-    dependencies: {
-        ...
-        "exchanger": "shtabnoy/exchanger"
-    }
-}
-```
-```
-import ExchangeWidget from 'exchanger'
-
-class App extends Component {
-    render() {
-        return (
-            <ExchangeWidget />
-            ...
-        )
-    }
-}
-```
+### Run app
+1. Clone repository
+2. `npm i`
+3. `npm start`
